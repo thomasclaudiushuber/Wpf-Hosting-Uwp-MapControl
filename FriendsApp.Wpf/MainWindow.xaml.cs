@@ -3,6 +3,7 @@ using FriendsApp.Wpf.Model;
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using Windows.Devices.Geolocation;
 
 namespace FriendsApp.Wpf
 {
@@ -20,13 +21,23 @@ namespace FriendsApp.Wpf
             dataGrid.ItemsSource = customerDataProvider.LoadFriends();
         }
 
-        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
                 if (dataGrid.SelectedItem is Friend friend)
                 {
-                    // TODO: Use the friend's latitude and longitude for the MapControl
+                    var basisGeoposition = new BasicGeoposition
+                    {
+                        Latitude = friend.Latitude,
+                        Longitude = friend.Longitude
+                    };
+
+                    var geopoint = new Geopoint(basisGeoposition);
+
+                    await mapControl.TrySetViewAsync(geopoint);
+
+                    await mapControl.TryZoomToAsync(12);
                 }
             }
             catch (Exception ex)
